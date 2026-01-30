@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  workflow_dispatch: # Manual trigger only
+    inputs:
+      release_type:
+        description: 'Type of release'
+        required: true
+        default: 'auto'
+        type: choice
+        options:
+          - auto
+          - patch
+          - minor
+          - major
+      dry_run:
+        description: 'Dry run (preview only)'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  lint:
+    name: 'Lint'
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    name: 'Test'
+    uses: ./.github/workflows/test.yml
+
+  build:
+    name: 'Build'
+    uses: ./.github/workflows/build.yml
+
+  publish-release:
+    name: 'Publish Release'
+    needs: [lint, test, build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+
+    steps:
+      - name: 'Generate App Token'
+        id: app-token
+        uses: actions/create-github-app-token@29824e69f54612133e76f7eaac726eef6c875baf # v2.2.1
+        with:
+          app-id: ${{ secrets.RELEASE_APP_ID }}
+          private-key: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}
+
+      - name: 'Checkout Repository'
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          token: ${{ steps.app-token.outputs.token }}
+
+      - name: 'Setup pnpm'
+        uses: pnpm/action-setup@41ff72655975bd51cab0327fa583b6e92b6d3061 # v4
+
+      - name: 'Setup Node.js'
+        uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6
+        with:
+          node-version: 24.13.0
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: 'Configure npm for OIDC'
+        run: |
+          echo "Removing token-based auth to enable OIDC..."
+          if [ -f "$NPM_CONFIG_USERCONFIG" ]; then
+            sed -i '/_authToken/d' "$NPM_CONFIG_USERCONFIG"
+            echo "registry=https://registry.npmjs.org/" > "$NPM_CONFIG_USERCONFIG"
+          fi
+          cat "$NPM_CONFIG_USERCONFIG" || true
+
+      - name: 'Install Dependencies'
+        run: pnpm install
+
+      - name: 'Build Package'
+        run: pnpm run build
+
+      - name: 'Execute Release'
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            echo "Running dry-run release..."
+            pnpm run release --dry-run
+          else
+            echo "Running release..."
+            pnpm run release
+          fi
+        env:
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}

@@ -1,0 +1,76 @@
+{
+  "pluginAlias": "XiaomiHome",
+  "pluginType": "platform",
+  "singular": true,
+  "headerDisplay": "Xiaomi/Yeelight devices require device tokens and static IPs. See the [README](https://github.com/raisedadead/homebridge-xiaomi-home#quick-start) for setup instructions.",
+  "footerDisplay": "For help, please [open an issue](https://github.com/raisedadead/homebridge-xiaomi-home/issues).",
+  "schema": {
+    "type": "object",
+    "required": ["name"],
+    "properties": {
+      "name": {
+        "title": "Platform Name",
+        "type": "string",
+        "default": "Xiaomi Home"
+      },
+      "pollingInterval": {
+        "title": "Polling Interval (seconds)",
+        "type": "integer",
+        "default": 15,
+        "minimum": 5,
+        "maximum": 60,
+        "description": "How often to refresh device state from the network"
+      },
+      "devices": {
+        "title": "Devices",
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["name", "ip", "token", "model"],
+          "properties": {
+            "name": {
+              "title": "Device Name",
+              "type": "string",
+              "description": "Display name in HomeKit"
+            },
+            "ip": {
+              "title": "IP Address",
+              "type": "string",
+              "format": "ipv4",
+              "description": "Device IP address (use DHCP reservation for stability)"
+            },
+            "token": {
+              "title": "Device Token",
+              "type": "string",
+              "pattern": "^[a-fA-F0-9]{32}$",
+              "description": "32-character hex token (see README for extraction)"
+            },
+            "model": {
+              "title": "Device Model",
+              "type": "string",
+              "oneOf": [
+                { "title": "Yeelight Color Bulb 3", "enum": ["yeelink.light.color3"] },
+                { "title": "Yeelight Bedside Lamp 2", "enum": ["yeelink.light.bslamp2"] }
+              ],
+              "description": "Exact model identifier from Mi Home app"
+            }
+          }
+        }
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "title": "General Settings",
+      "items": ["name", "pollingInterval"]
+    },
+    {
+      "key": "devices",
+      "type": "array",
+      "title": "Devices",
+      "buttonText": "Add Device",
+      "items": ["devices[].name", "devices[].ip", "devices[].token", "devices[].model"]
+    }
+  ]
+}

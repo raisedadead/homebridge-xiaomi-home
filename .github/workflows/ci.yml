@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: 'Lint'
+    uses: ./.github/workflows/lint.yml
+
+  test:
+    name: 'Test'
+    strategy:
+      matrix:
+        node-version: ['22', '24']
+    uses: ./.github/workflows/test.yml
+    with:
+      node-version: ${{ matrix.node-version }}
+
+  build:
+    name: 'Build'
+    needs: [lint, test]
+    uses: ./.github/workflows/build.yml
