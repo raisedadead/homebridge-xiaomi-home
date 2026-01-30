@@ -1,0 +1,1 @@
+export { LightbulbAccessory } from './lightbulb';

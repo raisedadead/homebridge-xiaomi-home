@@ -1,0 +1,23 @@
+{
+  "bridge": {
+    "name": "Test Homebridge",
+    "username": "CC:22:3D:E3:CE:30",
+    "port": 51826,
+    "pin": "031-45-154"
+  },
+  "platforms": [
+    {
+      "platform": "XiaomiHome",
+      "name": "Xiaomi Home",
+      "pollingInterval": 15,
+      "devices": [
+        {
+          "name": "Office Floor Lamp",
+          "ip": "192.168.1.71",
+          "token": "94b5a9460e1f8b6d25695de73da2c53e",
+          "model": "yeelink.light.color3"
+        }
+      ]
+    }
+  ]
+}
