@@ -1,0 +1,14 @@
+{
+  "extends": ["github>raisedadead/renovate-config"],
+  "packageRules": [
+    {
+      "matchDepTypes": ["engines"],
+      "enabled": false
+    },
+    {
+      "matchDepTypes": ["peerDependencies"],
+      "matchUpdateTypes": ["pin"],
+      "enabled": false
+    }
+  ]
+}

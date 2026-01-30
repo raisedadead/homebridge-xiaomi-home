@@ -1,0 +1,94 @@
+{
+  "name": "homebridge-xiaomi-home",
+  "version": "1.0.0",
+  "description": "Homebridge plugin for Xiaomi/Yeelight smart home devices",
+  "packageManager": "pnpm@9.15.4",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "config.schema.json",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "rimraf ./dist && tsc",
+    "watch": "tsc -w",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest run --coverage",
+    "lint": "oxlint src/",
+    "lint:fix": "oxlint src/ --fix",
+    "format": "prettier --write \"src/**/*.{ts,js,json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,js,json,md}\"",
+    "typecheck": "tsc --noEmit",
+    "check": "pnpm run lint && pnpm run typecheck && pnpm run test:coverage",
+    "release": "semantic-release",
+    "release:locally": "semantic-release --no-ci",
+    "prepare": "husky"
+  },
+  "keywords": [
+    "homebridge-plugin",
+    "xiaomi",
+    "yeelight",
+    "miio",
+    "smart-home",
+    "iot"
+  ],
+  "author": "Mrugesh Mohapatra",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raisedadead/homebridge-xiaomi-home.git"
+  },
+  "bugs": {
+    "url": "https://github.com/raisedadead/homebridge-xiaomi-home/issues"
+  },
+  "homepage": "https://github.com/raisedadead/homebridge-xiaomi-home#readme",
+  "engines": {
+    "node": "^18.17.0 || ^20.9.0 || ^22.0.0",
+    "homebridge": "^1.8.0 || ^2.0.0-beta.0"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js}": [
+      "oxlint --fix"
+    ],
+    "src/**/*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "miio": "^0.15.6"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^19.6.1",
+    "@commitlint/config-conventional": "^19.6.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/exec": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
+    "@semantic-release/github": "^11.0.1",
+    "@semantic-release/npm": "^12.0.1",
+    "@types/node": "^20.11.0",
+    "@vitest/coverage-v8": "^2.1.8",
+    "homebridge": "^1.8.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.3.0",
+    "oxlint": "^0.15.0",
+    "prettier": "^3.4.2",
+    "rimraf": "^5.0.5",
+    "semantic-release": "^24.2.1",
+    "typescript": "^5.3.0",
+    "vitest": "^2.1.8"
+  }
+}
