@@ -1,5 +1,12 @@
 # Homebridge Xiaomi Home
 
+[![CI](https://github.com/raisedadead/homebridge-xiaomi-home/actions/workflows/ci.yml/badge.svg)](https://github.com/raisedadead/homebridge-xiaomi-home/actions/workflows/ci.yml)
+[![npm version](https://img.shields.io/npm/v/homebridge-xiaomi-home.svg)](https://www.npmjs.com/package/homebridge-xiaomi-home)
+[![npm downloads](https://img.shields.io/npm/dm/homebridge-xiaomi-home.svg)](https://www.npmjs.com/package/homebridge-xiaomi-home)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node.js](https://img.shields.io/badge/node-%5E22%20%7C%7C%20%5E24-brightgreen.svg)](https://nodejs.org/)
+[![Homebridge](https://img.shields.io/badge/homebridge-%5E1.8%20%7C%7C%20%5E2.0-purple.svg)](https://homebridge.io/)
+
 A Homebridge plugin for Xiaomi/Yeelight smart home devices using local network control via the miio protocol.
 
 ## Features
