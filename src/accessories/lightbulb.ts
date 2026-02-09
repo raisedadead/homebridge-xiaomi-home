@@ -88,11 +88,6 @@ export class LightbulbAccessory {
         .onGet(this.getSaturation.bind(this))
         .onSet(this.setSaturation.bind(this));
     }
-
-    // StatusActive
-    this.service
-      .getCharacteristic(this.Characteristic.StatusActive)
-      .onGet(() => this.device.isConnected());
   }
 
   private startPolling(): void {
@@ -108,7 +103,6 @@ export class LightbulbAccessory {
         this.backoffMs = 0;
       } catch (error) {
         this.pollFailures++;
-        this.service.updateCharacteristic(this.Characteristic.StatusActive, false);
         if (this.pollFailures >= this.maxPollFailures) {
           // Exponential backoff: 30s, 60s, 120s, 240s, max 5min
           this.backoffMs = Math.min(
@@ -149,7 +143,6 @@ export class LightbulbAccessory {
   async refreshState(): Promise<void> {
     const state = await this.device.getState();
 
-    this.service.updateCharacteristic(this.Characteristic.StatusActive, true);
     this.service.updateCharacteristic(this.Characteristic.On, state.power);
 
     if (this.device.capabilities.brightness) {

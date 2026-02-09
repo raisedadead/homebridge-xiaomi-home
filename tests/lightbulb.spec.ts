@@ -439,52 +439,6 @@ describe('LightbulbAccessory', () => {
     });
   });
 
-  describe('StatusActive', () => {
-    it('registers StatusActive onGet handler', () => {
-      const handler = handlers.get('StatusActive')?.onGet;
-      expect(handler).toBeDefined();
-    });
-
-    it('returns device connectivity status', () => {
-      mockDevice.isConnected.mockReturnValue(true);
-      const handler = handlers.get('StatusActive')?.onGet;
-      expect(handler!()).toBe(true);
-
-      mockDevice.isConnected.mockReturnValue(false);
-      expect(handler!()).toBe(false);
-    });
-
-    it('updates StatusActive to true on successful poll', async () => {
-      const state = {
-        power: true,
-        brightness: 50,
-        colorTemp: 3000,
-        hue: 0,
-        saturation: 0,
-        colorMode: 'ct' as const,
-      };
-      mockDevice.getState.mockResolvedValue(state);
-
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(mockAccessory._lightbulbService.updateCharacteristic).toHaveBeenCalledWith(
-        'StatusActive',
-        true,
-      );
-    });
-
-    it('updates StatusActive to false on poll failure', async () => {
-      mockDevice.getState.mockRejectedValue(new Error('offline'));
-
-      await vi.advanceTimersByTimeAsync(0);
-
-      expect(mockAccessory._lightbulbService.updateCharacteristic).toHaveBeenCalledWith(
-        'StatusActive',
-        false,
-      );
-    });
-  });
-
   describe('first poll stagger', () => {
     it('fires first poll immediately for device index 0', async () => {
       mockDevice.getState.mockResolvedValue(mockDevice.cachedState);
