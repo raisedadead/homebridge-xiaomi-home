@@ -1,6 +1,6 @@
 {
   "name": "homebridge-xiaomi-home",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Homebridge plugin for Xiaomi/Yeelight smart home devices",
   "packageManager": "pnpm@10.28.2",
   "main": "dist/index.js",

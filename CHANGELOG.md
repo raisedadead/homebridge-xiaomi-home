@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/raisedadead/homebridge-xiaomi-home/compare/v1.0.3...v1.0.4) (2026-02-09)
+
+
+### Bug Fixes
+
+* remove extaneous props ([369751c](https://github.com/raisedadead/homebridge-xiaomi-home/commit/369751c414369a19168a80b3a32e94da8f69718f))
+
 ## [1.0.3](https://github.com/raisedadead/homebridge-xiaomi-home/compare/v1.0.2...v1.0.3) (2026-02-09)
 
 
