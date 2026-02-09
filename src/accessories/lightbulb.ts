@@ -16,6 +16,7 @@ export class LightbulbAccessory {
     private readonly platform: XiaomiHomePlatform,
     private readonly accessory: PlatformAccessory,
     private readonly device: BaseDevice,
+    private readonly deviceIndex: number = 0,
   ) {
     this.Characteristic = platform.Characteristic;
 
@@ -29,7 +30,8 @@ export class LightbulbAccessory {
       accessoryInfo
         .setCharacteristic(this.Characteristic.Manufacturer, 'Xiaomi')
         .setCharacteristic(this.Characteristic.Model, device.model)
-        .setCharacteristic(this.Characteristic.SerialNumber, accessory.context.config.ip);
+        .setCharacteristic(this.Characteristic.SerialNumber, accessory.context.config.ip)
+        .setCharacteristic(this.Characteristic.FirmwareRevision, '1.0.0');
     }
 
     // Get or create Lightbulb service
@@ -85,6 +87,11 @@ export class LightbulbAccessory {
         .onGet(this.getSaturation.bind(this))
         .onSet(this.setSaturation.bind(this));
     }
+
+    // StatusActive
+    this.service
+      .getCharacteristic(this.Characteristic.StatusActive)
+      .onGet(() => this.device.isConnected());
   }
 
   private startPolling(): void {
@@ -99,6 +106,7 @@ export class LightbulbAccessory {
         this.backoffMs = 0;
       } catch (error) {
         this.pollFailures++;
+        this.service.updateCharacteristic(this.Characteristic.StatusActive, false);
         if (this.pollFailures >= this.maxPollFailures) {
           // Exponential backoff: 30s, 60s, 120s, 240s, max 5min
           this.backoffMs = Math.min(
@@ -119,8 +127,9 @@ export class LightbulbAccessory {
       this.pollingInterval = setTimeout(() => poll(), nextInterval);
     };
 
-    // Start first poll
-    this.pollingInterval = setTimeout(() => poll(), baseInterval);
+    // Stagger first poll across devices (2s apart) — but start soon
+    const staggerDelay = this.deviceIndex * 2000;
+    this.pollingInterval = setTimeout(() => poll(), staggerDelay);
   }
 
   public stopPolling(): void {
@@ -138,6 +147,7 @@ export class LightbulbAccessory {
   async refreshState(): Promise<void> {
     const state = await this.device.getState();
 
+    this.service.updateCharacteristic(this.Characteristic.StatusActive, true);
     this.service.updateCharacteristic(this.Characteristic.On, state.power);
 
     if (this.device.capabilities.brightness) {
@@ -157,35 +167,23 @@ export class LightbulbAccessory {
     }
   }
 
-  // Handlers with error handling
   async getOn(): Promise<CharacteristicValue> {
-    try {
-      const state = await this.device.getState();
-      return state.power;
-    } catch (error) {
-      this.platform.log.error('Failed to get power state:', error);
-      return this.device.cachedState.power;
-    }
+    return this.device.cachedState.power;
   }
 
   async setOn(value: CharacteristicValue): Promise<void> {
+    const power = value === true || value === 1;
     try {
-      await this.device.setPower(value as boolean);
+      await this.device.setPower(power);
       this.resetBackoff();
     } catch (error) {
       this.platform.log.error('Failed to set power:', error);
-      throw error;
+      throw new this.platform.api.hap.HapStatusError(-70402);
     }
   }
 
   async getBrightness(): Promise<CharacteristicValue> {
-    try {
-      const state = await this.device.getState();
-      return state.brightness;
-    } catch (error) {
-      this.platform.log.error('Failed to get brightness:', error);
-      return this.device.cachedState.brightness;
-    }
+    return this.device.cachedState.brightness;
   }
 
   async setBrightness(value: CharacteristicValue): Promise<void> {
@@ -193,18 +191,12 @@ export class LightbulbAccessory {
       await this.device.setBrightness(value as number);
     } catch (error) {
       this.platform.log.error('Failed to set brightness:', error);
-      throw error;
+      throw new this.platform.api.hap.HapStatusError(-70402);
     }
   }
 
   async getColorTemperature(): Promise<CharacteristicValue> {
-    try {
-      const state = await this.device.getState();
-      return this.clampMired(this.kelvinToMired(state.colorTemp));
-    } catch (error) {
-      this.platform.log.error('Failed to get color temperature:', error);
-      return this.clampMired(this.kelvinToMired(this.device.cachedState.colorTemp));
-    }
+    return this.clampMired(this.kelvinToMired(this.device.cachedState.colorTemp));
   }
 
   async setColorTemperature(value: CharacteristicValue): Promise<void> {
@@ -213,18 +205,12 @@ export class LightbulbAccessory {
       await this.device.setColorTemperature(kelvin);
     } catch (error) {
       this.platform.log.error('Failed to set color temperature:', error);
-      throw error;
+      throw new this.platform.api.hap.HapStatusError(-70402);
     }
   }
 
   async getHue(): Promise<CharacteristicValue> {
-    try {
-      const state = await this.device.getState();
-      return state.hue;
-    } catch (error) {
-      this.platform.log.error('Failed to get hue:', error);
-      return this.device.cachedState.hue;
-    }
+    return this.device.cachedState.hue;
   }
 
   async setHue(value: CharacteristicValue): Promise<void> {
@@ -232,18 +218,12 @@ export class LightbulbAccessory {
       await this.device.setHue(value as number);
     } catch (error) {
       this.platform.log.error('Failed to set hue:', error);
-      throw error;
+      throw new this.platform.api.hap.HapStatusError(-70402);
     }
   }
 
   async getSaturation(): Promise<CharacteristicValue> {
-    try {
-      const state = await this.device.getState();
-      return state.saturation;
-    } catch (error) {
-      this.platform.log.error('Failed to get saturation:', error);
-      return this.device.cachedState.saturation;
-    }
+    return this.device.cachedState.saturation;
   }
 
   async setSaturation(value: CharacteristicValue): Promise<void> {
@@ -251,7 +231,7 @@ export class LightbulbAccessory {
       await this.device.setSaturation(value as number);
     } catch (error) {
       this.platform.log.error('Failed to set saturation:', error);
-      throw error;
+      throw new this.platform.api.hap.HapStatusError(-70402);
     }
   }
 
