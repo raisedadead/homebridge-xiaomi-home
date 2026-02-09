@@ -10,6 +10,7 @@ export abstract class BaseDevice {
   protected device: Device | null = null;
   protected connected = false;
   protected connecting: Promise<void> | null = null;
+  private shuttingDown = false;
   public cachedState: DeviceState = {
     power: false,
     brightness: 100,
@@ -44,11 +45,16 @@ export abstract class BaseDevice {
   }
 
   private async doConnect(): Promise<void> {
+    let timerId: ReturnType<typeof setTimeout> | undefined;
+    const timeout = new Promise<never>((_, reject) => {
+      timerId = setTimeout(() => reject(new Error(`Connection to ${this.ip} timed out`)), 10000);
+    });
+    timeout.catch(() => {});
     try {
-      this.device = await miio.device({
-        address: this.ip,
-        token: this.token,
-      });
+      this.device = (await Promise.race([
+        miio.device({ address: this.ip, token: this.token }),
+        timeout,
+      ])) as Device;
       this.connected = true;
       this.log.info(`Connected to ${this.name} at ${this.ip}`);
     } catch (error) {
@@ -56,10 +62,13 @@ export abstract class BaseDevice {
       this.device = null;
       this.log.error(`Failed to connect to ${this.name} at ${this.ip}:`, error);
       throw error;
+    } finally {
+      clearTimeout(timerId);
     }
   }
 
   disconnect(): void {
+    this.shuttingDown = true;
     if (this.device) {
       this.device.destroy();
       this.device = null;
@@ -73,6 +82,10 @@ export abstract class BaseDevice {
   }
 
   protected async call(method: string, params: (string | number)[]): Promise<unknown> {
+    if (this.shuttingDown) {
+      throw new Error('Device is shutting down');
+    }
+
     if (!this.connected || !this.device) {
       await this.connect();
     }
@@ -84,8 +97,9 @@ export abstract class BaseDevice {
     try {
       return await this.device.call(method, params);
     } catch (error) {
-      // Mark as disconnected so next call will reconnect
       this.connected = false;
+      this.device?.destroy();
+      this.device = null;
       throw error;
     }
   }

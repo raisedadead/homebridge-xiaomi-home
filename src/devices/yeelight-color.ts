@@ -18,6 +18,12 @@ export abstract class YeelightColorDevice extends BaseDevice {
 
   readonly colorTempRange = { min: 1700, max: 6500 };
 
+  private pendingHSV: { hue?: number; sat?: number } = {};
+  private hsvDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+  private hsvFlushPromise: Promise<void> | null = null;
+  private hsvFlushResolve: (() => void) | null = null;
+  private hsvFlushReject: ((error: unknown) => void) | null = null;
+
   constructor(ip: string, token: string, log: LoggerType) {
     super(ip, token, log);
   }
@@ -82,15 +88,60 @@ export abstract class YeelightColorDevice extends BaseDevice {
 
   async setHue(hue: number): Promise<void> {
     const clamped = Math.max(0, Math.min(360, hue));
-    await this.call('set_hsv', [clamped, this.cachedState.saturation, 'smooth', 500]);
+    this.pendingHSV.hue = clamped;
     this.cachedState.hue = clamped;
     this.cachedState.colorMode = 'hsv';
+    return this.scheduleHSVFlush();
   }
 
   async setSaturation(saturation: number): Promise<void> {
     const clamped = Math.max(0, Math.min(100, saturation));
-    await this.call('set_hsv', [this.cachedState.hue, clamped, 'smooth', 500]);
+    this.pendingHSV.sat = clamped;
     this.cachedState.saturation = clamped;
     this.cachedState.colorMode = 'hsv';
+    return this.scheduleHSVFlush();
+  }
+
+  private scheduleHSVFlush(): Promise<void> {
+    if (this.hsvDebounceTimer) {
+      clearTimeout(this.hsvDebounceTimer);
+    }
+
+    if (!this.hsvFlushPromise) {
+      this.hsvFlushPromise = new Promise<void>((resolve, reject) => {
+        this.hsvFlushResolve = resolve;
+        this.hsvFlushReject = reject;
+      });
+    }
+
+    const promise = this.hsvFlushPromise;
+
+    this.hsvDebounceTimer = setTimeout(async () => {
+      const resolve = this.hsvFlushResolve;
+      const reject = this.hsvFlushReject;
+      this.hsvFlushPromise = null;
+      this.hsvFlushResolve = null;
+      this.hsvFlushReject = null;
+
+      try {
+        const hue = this.pendingHSV.hue ?? this.cachedState.hue;
+        const sat = this.pendingHSV.sat ?? this.cachedState.saturation;
+        await this.call('set_hsv', [hue, sat, 'smooth', 500]);
+        this.pendingHSV = {};
+        resolve?.();
+      } catch (error) {
+        reject?.(error);
+      }
+    }, 100);
+
+    return promise;
+  }
+
+  clearPendingUpdates(): void {
+    if (this.hsvDebounceTimer) {
+      clearTimeout(this.hsvDebounceTimer);
+      this.hsvDebounceTimer = null;
+    }
+    this.pendingHSV = {};
   }
 }
