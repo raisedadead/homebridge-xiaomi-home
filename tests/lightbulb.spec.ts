@@ -512,11 +512,42 @@ describe('LightbulbAccessory', () => {
   });
 
   describe('FirmwareRevision', () => {
-    it('sets FirmwareRevision on accessory info', () => {
+    it('sets FirmwareRevision from package.json version', async () => {
+      const { version } = await import('../package.json');
       expect(mockAccessory._infoService.setCharacteristic).toHaveBeenCalledWith(
         'FirmwareRevision',
-        '1.0.0',
+        version,
       );
+    });
+  });
+
+  describe('onSet rejects NaN values (I5)', () => {
+    it('setBrightness rejects NaN', async () => {
+      const handler = handlers.get('Brightness')?.onSet;
+      await expect(handler!('not-a-number')).rejects.toBeInstanceOf(MockHapStatusError);
+      await expect(handler!('not-a-number')).rejects.toMatchObject({ hapStatus: -70410 });
+    });
+
+    it('setColorTemperature rejects NaN', async () => {
+      const handler = handlers.get('ColorTemperature')?.onSet;
+      await expect(handler!('bad')).rejects.toBeInstanceOf(MockHapStatusError);
+    });
+
+    it('setHue rejects NaN', async () => {
+      const handler = handlers.get('Hue')?.onSet;
+      await expect(handler!('bad')).rejects.toBeInstanceOf(MockHapStatusError);
+    });
+
+    it('setSaturation rejects NaN', async () => {
+      const handler = handlers.get('Saturation')?.onSet;
+      await expect(handler!('bad')).rejects.toBeInstanceOf(MockHapStatusError);
+    });
+
+    it('setBrightness accepts numeric string', async () => {
+      mockDevice.setBrightness.mockResolvedValue(undefined);
+      const handler = handlers.get('Brightness')?.onSet;
+      await handler!('50');
+      expect(mockDevice.setBrightness).toHaveBeenCalledWith(50);
     });
   });
 });

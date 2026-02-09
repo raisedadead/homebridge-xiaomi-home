@@ -58,7 +58,10 @@ export class XiaomiHomePlatform implements DynamicPlatformPlugin {
     const supportedModels = getSupportedModels();
     const validConfigs = deviceConfigs.filter(d => {
       if (!d.name || !d.ip || !d.token || !d.model) {
-        this.log.error('Invalid device config, missing required fields:', d);
+        this.log.error('Invalid device config, missing required fields:', {
+          ...d,
+          token: d.token ? '***' : 'missing',
+        });
         return false;
       }
       if (!supportedModels.includes(d.model)) {
@@ -96,8 +99,14 @@ export class XiaomiHomePlatform implements DynamicPlatformPlugin {
 
     const device = createDevice(deviceConfig.model, deviceConfig.ip, deviceConfig.token, this.log);
 
-    await device.connect();
-    await device.getState();
+    try {
+      await device.connect();
+      await device.getState();
+    } catch {
+      this.log.warn(
+        `Device ${deviceConfig.name} at ${deviceConfig.ip} is offline, will retry via polling`,
+      );
+    }
 
     this.devices.set(uuid, device);
 

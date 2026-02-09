@@ -138,7 +138,7 @@ describe('XiaomiHomePlatform', () => {
       expect(device2.connect).toHaveBeenCalled();
     });
 
-    it('one offline device does not block others', async () => {
+    it('offline device still gets accessory registered (C2)', async () => {
       const device1 = createMockDevice({
         connect: vi.fn().mockRejectedValue(new Error('timeout')),
       });
@@ -153,11 +153,8 @@ describe('XiaomiHomePlatform', () => {
       ];
       await createPlatformAndDiscover(configs);
 
-      expect(mockLightbulbAccessory).toHaveBeenCalledTimes(1);
-      expect(mockLog.error).toHaveBeenCalledWith(
-        'Device initialization failed:',
-        expect.any(Error),
-      );
+      expect(mockLightbulbAccessory).toHaveBeenCalledTimes(2);
+      expect(mockLog.warn).toHaveBeenCalledWith(expect.stringContaining('Offline'));
     });
   });
 
@@ -248,7 +245,7 @@ describe('XiaomiHomePlatform', () => {
       expect(mockedCreateDevice).toHaveBeenCalledTimes(1);
       expect(mockLog.error).toHaveBeenCalledWith(
         'Invalid device config, missing required fields:',
-        expect.objectContaining({ name: '' }),
+        expect.objectContaining({ name: '', token: '***' }),
       );
     });
 

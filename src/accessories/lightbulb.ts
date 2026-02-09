@@ -1,6 +1,7 @@
 import { Service, PlatformAccessory, CharacteristicValue, Characteristic } from 'homebridge';
 import { XiaomiHomePlatform } from '../platform';
 import { BaseDevice } from '../devices';
+import { PLUGIN_VERSION } from '../settings';
 
 export class LightbulbAccessory {
   private service: Service;
@@ -31,7 +32,7 @@ export class LightbulbAccessory {
         .setCharacteristic(this.Characteristic.Manufacturer, 'Xiaomi')
         .setCharacteristic(this.Characteristic.Model, device.model)
         .setCharacteristic(this.Characteristic.SerialNumber, accessory.context.config.ip)
-        .setCharacteristic(this.Characteristic.FirmwareRevision, '1.0.0');
+        .setCharacteristic(this.Characteristic.FirmwareRevision, PLUGIN_VERSION);
     }
 
     // Get or create Lightbulb service
@@ -95,8 +96,9 @@ export class LightbulbAccessory {
   }
 
   private startPolling(): void {
-    const configInterval = this.platform.config.pollingInterval;
-    const baseInterval = Math.max(5, Math.min(60, configInterval || 15)) * 1000;
+    const configInterval = Number(this.platform.config.pollingInterval);
+    const baseInterval =
+      Math.max(5, Math.min(60, isNaN(configInterval) ? 15 : configInterval)) * 1000;
 
     const poll = async () => {
       try {
@@ -187,8 +189,12 @@ export class LightbulbAccessory {
   }
 
   async setBrightness(value: CharacteristicValue): Promise<void> {
+    const level = Number(value);
+    if (isNaN(level)) {
+      throw new this.platform.api.hap.HapStatusError(-70410);
+    }
     try {
-      await this.device.setBrightness(value as number);
+      await this.device.setBrightness(level);
     } catch (error) {
       this.platform.log.error('Failed to set brightness:', error);
       throw new this.platform.api.hap.HapStatusError(-70402);
@@ -200,8 +206,12 @@ export class LightbulbAccessory {
   }
 
   async setColorTemperature(value: CharacteristicValue): Promise<void> {
+    const mired = Number(value);
+    if (isNaN(mired)) {
+      throw new this.platform.api.hap.HapStatusError(-70410);
+    }
     try {
-      const kelvin = this.miredToKelvin(value as number);
+      const kelvin = this.miredToKelvin(mired);
       await this.device.setColorTemperature(kelvin);
     } catch (error) {
       this.platform.log.error('Failed to set color temperature:', error);
@@ -214,8 +224,12 @@ export class LightbulbAccessory {
   }
 
   async setHue(value: CharacteristicValue): Promise<void> {
+    const hue = Number(value);
+    if (isNaN(hue)) {
+      throw new this.platform.api.hap.HapStatusError(-70410);
+    }
     try {
-      await this.device.setHue(value as number);
+      await this.device.setHue(hue);
     } catch (error) {
       this.platform.log.error('Failed to set hue:', error);
       throw new this.platform.api.hap.HapStatusError(-70402);
@@ -227,8 +241,12 @@ export class LightbulbAccessory {
   }
 
   async setSaturation(value: CharacteristicValue): Promise<void> {
+    const sat = Number(value);
+    if (isNaN(sat)) {
+      throw new this.platform.api.hap.HapStatusError(-70410);
+    }
     try {
-      await this.device.setSaturation(value as number);
+      await this.device.setSaturation(sat);
     } catch (error) {
       this.platform.log.error('Failed to set saturation:', error);
       throw new this.platform.api.hap.HapStatusError(-70402);

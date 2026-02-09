@@ -142,6 +142,10 @@ export abstract class YeelightColorDevice extends BaseDevice {
       clearTimeout(this.hsvDebounceTimer);
       this.hsvDebounceTimer = null;
     }
+    this.hsvFlushResolve?.();
+    this.hsvFlushPromise = null;
+    this.hsvFlushResolve = null;
+    this.hsvFlushReject = null;
     this.pendingHSV = {};
   }
 }

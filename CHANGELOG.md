@@ -1,18 +1,18 @@
-# 1.0.0 (2026-02-03)
+# [1.0.2](https://github.com/raisedadead/homebridge-xiaomi-home/compare/v1.0.1...v1.0.2) (2026-02-03)
 
+### Documentation
 
-### Features
+- update readme ([3499846](https://github.com/raisedadead/homebridge-xiaomi-home/commit/3499846))
 
-* initial commit ([e311a5e](https://github.com/raisedadead/homebridge-xiaomi-home/commit/e311a5ea7786654332914755ba04c1b3f9d0f30d))
-
-# 1.0.0 (2026-01-30)
-
+# [1.0.1](https://github.com/raisedadead/homebridge-xiaomi-home/compare/v1.0.0...v1.0.1) (2026-02-03)
 
 ### Bug Fixes
 
-* code review and sanity checks ([90c5dd8](https://github.com/raisedadead/homebridge-xiaomi-home/commit/90c5dd84b0500598ea33dbd24baa774aac731f81))
+- manual patch release
 
+# 1.0.0 (2026-01-30)
 
 ### Features
 
-* initial commit ([dcb453c](https://github.com/raisedadead/homebridge-xiaomi-home/commit/dcb453cd4321f5cd86bfb6c02834a1274fda6328))
+- initial commit
+  ([e311a5e](https://github.com/raisedadead/homebridge-xiaomi-home/commit/e311a5ea7786654332914755ba04c1b3f9d0f30d))
