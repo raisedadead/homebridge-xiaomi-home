@@ -2,15 +2,23 @@
   "name": "homebridge-xiaomi-home",
   "version": "1.0.4",
   "description": "Homebridge plugin for Xiaomi/Yeelight smart home devices",
-  "packageManager": "pnpm@10.28.2",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "require": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    },
-    "./package.json": "./package.json"
+  "keywords": [
+    "homebridge-plugin",
+    "iot",
+    "miio",
+    "smart-home",
+    "xiaomi",
+    "yeelight"
+  ],
+  "homepage": "https://github.com/raisedadead/homebridge-xiaomi-home#readme",
+  "bugs": {
+    "url": "https://github.com/raisedadead/homebridge-xiaomi-home/issues"
+  },
+  "license": "ISC",
+  "author": "Mrugesh Mohapatra",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/raisedadead/homebridge-xiaomi-home.git"
   },
   "files": [
     "dist",
@@ -18,6 +26,19 @@
     "README.md",
     "LICENSE"
   ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "build": "rimraf ./dist && tsc",
     "watch": "tsc -w",
@@ -35,40 +56,6 @@
     "prepare": "husky",
     "test-device": "node scripts/test-device.mjs",
     "debug": "node scripts/debug.mjs"
-  },
-  "keywords": [
-    "homebridge-plugin",
-    "xiaomi",
-    "yeelight",
-    "miio",
-    "smart-home",
-    "iot"
-  ],
-  "author": "Mrugesh Mohapatra",
-  "license": "MIT",
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/raisedadead/homebridge-xiaomi-home.git"
-  },
-  "bugs": {
-    "url": "https://github.com/raisedadead/homebridge-xiaomi-home/issues"
-  },
-  "homepage": "https://github.com/raisedadead/homebridge-xiaomi-home#readme",
-  "engines": {
-    "node": "^22.0.0 || ^24.0.0",
-    "homebridge": "^1.8.0 || ^2.0.0-beta.0"
-  },
-  "publishConfig": {
-    "access": "public",
-    "provenance": true
-  },
-  "lint-staged": {
-    "src/**/*.{ts,js}": [
-      "oxlint --fix"
-    ],
-    "src/**/*.{ts,js,json,md}": [
-      "prettier --write"
-    ]
   },
   "dependencies": {
     "miio": "^0.15.6"
@@ -93,5 +80,18 @@
     "semantic-release": "^25.0.3",
     "typescript": "^5.9.3",
     "vitest": "^4.0.18"
-  }
+  },
+  "lint-staged": {
+    "src/**/*.{ts,js}": [
+      "oxlint --fix"
+    ],
+    "src/**/*.{ts,js,json,md}": [
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "homebridge": "^1.8.0 || ^2.0.0-beta.0",
+    "node": "^22.0.0 || ^24.0.0"
+  },
+  "packageManager": "pnpm@10.28.2"
 }

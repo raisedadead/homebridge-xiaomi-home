@@ -3,11 +3,15 @@
 [![CI](https://github.com/raisedadead/homebridge-xiaomi-home/actions/workflows/ci.yml/badge.svg)](https://github.com/raisedadead/homebridge-xiaomi-home/actions/workflows/ci.yml)
 [![npm version](https://img.shields.io/npm/v/homebridge-xiaomi-home.svg)](https://www.npmjs.com/package/homebridge-xiaomi-home)
 [![npm downloads](https://img.shields.io/npm/dm/homebridge-xiaomi-home.svg)](https://www.npmjs.com/package/homebridge-xiaomi-home)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
 [![Node.js](https://img.shields.io/badge/node-%5E22%20%7C%7C%20%5E24-brightgreen.svg)](https://nodejs.org/)
 [![Homebridge](https://img.shields.io/badge/homebridge-%5E1.8%20%7C%7C%20%5E2.0-purple.svg)](https://homebridge.io/)
 
-A Homebridge plugin for Xiaomi/Yeelight smart home devices using local network control via the miio protocol.
+> Control your Xiaomi lights from HomeKit, no cloud required.
+
+## What is this about?
+
+A [Homebridge](https://homebridge.io/) plugin for Xiaomi/Yeelight smart home devices using local network control via the [miio protocol](https://github.com/OpenMiHome/mihome-binary-protocol). Communicates directly with devices on your LAN — no cloud dependency.
 
 ## Features
 
@@ -20,8 +24,6 @@ A Homebridge plugin for Xiaomi/Yeelight smart home devices using local network c
 - **Fast Response** – Direct device communication without cloud latency
 - **Extensible** – Easy to add support for new device models
 
----
-
 ## Supported Devices
 
 | Model                   | Name                    | Capabilities                              |
@@ -30,8 +32,6 @@ A Homebridge plugin for Xiaomi/Yeelight smart home devices using local network c
 | `yeelink.light.bslamp2` | Yeelight Bedside Lamp 2 | Power, Brightness, Color Temperature, RGB |
 
 > More devices can be added! See [Contributing](#contributing).
-
----
 
 ## Installation
 
@@ -44,8 +44,6 @@ yarn global add homebridge-xiaomi-home
 ```
 
 Or search for **"Xiaomi Home"** in the Homebridge UI plugins tab.
-
----
 
 ## Quick Start
 
@@ -118,8 +116,6 @@ Add to your Homebridge `config.json`:
 
 Your devices should now appear in the Home app!
 
----
-
 ## Configuration Options
 
 | Option            | Type     | Default         | Description                       |
@@ -138,19 +134,15 @@ Your devices should now appear in the Home app!
 | `token` | `string` | 32-character hex device token                      |
 | `model` | `string` | Device model identifier (see supported devices)    |
 
----
-
 ## Setup Requirements
 
 ### Static IP Addresses
 
 Devices must have stable IP addresses. Set up DHCP reservation on your router:
 
-1. **Find the device MAC address** – Mi Home app → Device → Settings → Network Info
-2. **Create DHCP reservation** – Router admin → DHCP settings → Add reservation
+1. **Find the device MAC address** – Mi Home app > Device > Settings > Network Info
+2. **Create DHCP reservation** – Router admin > DHCP settings > Add reservation
 3. **Apply** – Power cycle the device and verify with `ping`
-
----
 
 ## Troubleshooting
 
@@ -183,35 +175,10 @@ Then follow the token extraction instructions above.
 - Verify device is powered on and connected to WiFi
 - Try restarting both device and Homebridge
 
----
-
 ## Contributing
 
-Contributions are welcome! To add support for a new device:
-
-1. Fork the repository
-2. Add device definition in `src/devices/`
-3. Register in `src/devices/index.ts`
-4. Submit a pull request
-
-For bugs and feature requests, please [open an issue](https://github.com/raisedadead/homebridge-xiaomi-home/issues).
-
----
+Contributions are welcome! For bugs and feature requests, please [open an issue](https://github.com/raisedadead/homebridge-xiaomi-home/issues).
 
 ## License
 
-MIT License - see [LICENSE](./LICENSE) file for details.
-
----
-
-## Related Links
-
-- **[Homebridge](https://homebridge.io/)** – HomeKit support for the impatient
-- **[miio Protocol](https://github.com/OpenMiHome/mihome-binary-protocol)** – Protocol documentation
-- **[python-miio](https://github.com/rytilahti/python-miio)** – Python library for Xiaomi devices
-- **[Homebridge Discord](https://discord.gg/kqNCe2D)** – Get help from the community
-
-## Support
-
-- [Issues](https://github.com/raisedadead/homebridge-xiaomi-home/issues)
-- [Discussions](https://github.com/raisedadead/homebridge-xiaomi-home/discussions)
+ISC License - see [LICENSE](./LICENSE) file for details.
